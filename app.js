@@ -145,6 +145,21 @@
     }
     build();
     window.addEventListener('resize', function () { requestAnimationFrame(build); }, { passive: true });
+
+    /* The navbar is transparent over the hero and carries a ground below it.
+       Same collapsed-to-the-navbar-line trick as the theme observer, watching
+       the hero alone: while any part of the hero crosses that line the bar
+       stays transparent, and the moment it does not, the ground fades in. */
+    var hero = page.querySelector('.hero');
+    if (hero) {
+      var c2 = centre(), vh2 = window.innerHeight || 0;
+      var solidIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          navbar.setAttribute('data-nav-solid', e.isIntersecting ? 'off' : 'on');
+        });
+      }, { rootMargin: '-' + c2 + 'px 0px -' + Math.max(0, vh2 - c2 - 1) + 'px 0px', threshold: 0 });
+      solidIO.observe(hero);
+    }
   })();
 
   /* ================= parallax =================

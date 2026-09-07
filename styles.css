@@ -175,12 +175,12 @@ main{flex:1 0 auto}
    held solid for exactly the navbar's height and faded out well before the
    headline. Its own layer, so --hero-overlay-opacity keeps its meaning; above
    the overlay (z 20) and below the content (z 30). */
-.hero::after{
-  content:"";position:absolute;inset-inline:0;top:0;z-index:21;pointer-events:none;
-  height:calc(var(--navbar-height) * 5);
-  background:linear-gradient(to bottom,var(--color-black),var(--color-black) var(--navbar-height),transparent);
-  opacity:.62;
-}
+/* The scrim that used to live here has moved onto the navbar itself
+   (see "Navbar ground" at the end of this file). Anchored to the hero it
+   scrolled out from under the fixed navbar: correct at scroll 0, and by 600px
+   into the hero the navbar was sitting on unscrimmed photograph again, which
+   is exactly what the scroll probe measured. A scrim for a fixed element
+   belongs on that element. */
 .hero__content{
   position:relative;z-index:30;display:flex;flex-direction:column;justify-content:flex-end;
   gap:var(--spacing-s);width:100%;padding:var(--spacing-m);color:var(--color-white);
@@ -558,8 +558,60 @@ html{color-scheme:light}
 .product-card__info{align-items:flex-start}
 .product-card__meta{flex:1 1 58%;min-width:0}
 .product-card__note{flex:0 1 42%;white-space:normal}
-@media (max-width:47.99rem){
-  /* two-column phone grid: the row is ~170px, so name and note stack */
+/* Measured, not guessed: the card is 171px at 390, 172 at 768 and 236 at 1024.
+   In a row at 768 that leaves the name 90px and the note 66px, both cramped
+   against names as long as "Flóki Young Malt Sheep Dung Smoked". Stack them
+   until the card is wide enough to hold both on one line. */
+@media (max-width:63.99rem){
   .product-card__info{flex-direction:column;gap:var(--spacing-xxxs)}
   .product-card__note{flex:none;text-align:left}
+}
+
+/* ==========================================================================
+   Navbar ground (Eimverk-specific adaptation of the reference).
+
+   MEASURED, not assumed. `_qa-navscroll.mjs` walks the page and reads the
+   median luminance actually rendered behind each nav slot at every scroll
+   position. The transparent navbar failed 27 slots at 390 and 13 at 1440,
+   worst case 1.03:1 (ink on a near-black photograph, invisible).
+
+   The reference can keep a transparent navbar because its page is mostly paper
+   with dark photographs under a black announcement bar. This page is
+   photograph-heavy at mid luminance, where BOTH themes fail: white ink over a
+   ground of 80 is 2.7:1 and black ink over the same ground is 2.8:1. Flipping
+   the theme cannot fix it, so the navbar is given a real ground.
+
+   It stays transparent over the hero, so the opening moment is unchanged, and
+   from there carries the section's own tone from the two-tone palette. Nothing
+   new is introduced: the bar is paper over paper sections and ink over
+   photographic ones, which is the system's own pair. */
+.navbar::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:var(--color-white);opacity:0;
+  transition:opacity .3s ease,background-color .3s ease;
+}
+.navbar[data-nav-theme="dark"]::before{background:var(--color-black)}
+.navbar[data-nav-solid="on"]::before{opacity:1}
+
+/* Over the hero the bar has no ground, so it carries the scrim instead, on its
+   own fixed layer where it cannot scroll away. Same vignetting the hero used to
+   paint, held for the navbar's height and faded out well above the headline. */
+.navbar::after{
+  content:"";position:absolute;inset-inline:0;top:0;z-index:-1;pointer-events:none;
+  height:calc(var(--navbar-height) * 2.6);
+  background:linear-gradient(to bottom,var(--color-black),var(--color-black) 42%,transparent);
+  opacity:.72;transition:opacity .3s ease;
+}
+.navbar[data-nav-solid="on"]::after{opacity:0}
+
+/* The reference's tile overlay is a radial that is WEAKEST at the centre,
+   which suits a tile whose content is centred. Ours is bottom-anchored, and at
+   768 the FLÓKI heading landed on the palest barrel staves at 51% luminance.
+   Raising the radial's opacity flattens the whole photograph to fix one corner,
+   so a bottom-up scrim is stacked under it instead: the heading, the copy and
+   the button get a guaranteed ground and the top of the image keeps its light. */
+.featured-products__overlay{
+  background:
+    linear-gradient(to top,var(--color-black) 0%,rgba(20,20,20,0) 74%),
+    radial-gradient(ellipse at center,transparent 0%,var(--color-black) 100%);
 }
