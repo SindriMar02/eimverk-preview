@@ -313,8 +313,6 @@ main{flex:1 0 auto}
 @media (min-width:48rem){
   .split-media__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .split-media__panel{aspect-ratio:720/760}
-  .split-media__content{flex-direction:row;align-items:flex-start;gap:var(--spacing-m)}
-  .split-media__trailing{margin-left:auto}
 }
 
 /* ---------------- footer ---------------- */
@@ -437,7 +435,7 @@ body.is-modal-open{overflow:hidden}
 .heat__row{display:flex;align-items:baseline;justify-content:space-between;gap:var(--spacing-m);padding-block:var(--spacing-s);border-bottom:1px solid var(--color-light-gray)}
 .reviews__meta{display:flex;flex-direction:column;gap:var(--spacing-xxs)}
 .footer__eyebrow{margin-bottom:var(--spacing-xs)}
-@media (min-width:48rem){.split-media__trailing--end{margin-left:auto;align-items:flex-end;text-align:right;display:flex;flex-direction:column}}
+
 
 /* footer legal: reference behaviour. On mobile the row is two halves and the
    middle line is hidden. Scoped to max-width so it cannot override the
@@ -614,4 +612,39 @@ html{color-scheme:light}
   background:
     linear-gradient(to top,var(--color-black) 0%,rgba(20,20,20,0) 74%),
     radial-gradient(ellipse at center,transparent 0%,var(--color-black) 100%);
+}
+
+
+/* ==========================================================================
+   The two visit panels.
+
+   They were the reference's row: a heading pushed left and a trailing block
+   pushed right, which works in a full-width band and not in a half-width panel.
+   With a real paragraph and an action in each, a two-word heading sat alone at
+   one edge while the copy jammed against the other, and the shop panel was
+   right-aligned on top of that, so the pair read as two different components
+   with a stray word under one of them.
+
+   Both panels are now the same object: heading, copy, one action, stacked and
+   anchored to the bottom of the frame, which is where the hero already puts its
+   own stack. The eye gets one shape twice instead of two shapes once. */
+.split-media__panel{display:flex;flex-direction:column;justify-content:flex-end}
+.split-media__content{gap:var(--spacing-m);padding:var(--spacing-xl) var(--spacing-l)}
+.split-media__heading{
+  font-family:var(--font-display);letter-spacing:-.02em;line-height:1;
+  font-size:clamp(1.75rem,1.25rem + 1.6vw,2.5rem);
+}
+.split-media__body{max-width:24rem}
+.split-media__body p{text-wrap:pretty}
+.split-media__btn{margin-top:0}
+/* A flat tint over a whole photograph has to be heavy enough for its brightest
+   corner, which flattens the rest. The content is bottom-anchored, so the ground
+   it needs is too: same device as the product tiles. */
+.split-media__panel::after{
+  content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
+  background:linear-gradient(to top,var(--color-black) 0%,rgba(20,20,20,0) 62%);
+  opacity:.85;
+}
+@media (min-width:48rem){
+  .split-media__content{padding:var(--spacing-xxl) var(--spacing-xl)}
 }
